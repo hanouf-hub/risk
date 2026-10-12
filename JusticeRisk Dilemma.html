@@ -1,0 +1,388 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>JusticeRisk Dilemma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: one centred slide-like stage (max 880px). Intro with scales, one question per screen, then a results screen with ranked bars. Dark-first like the deck; light mode uses the cream slide. */
+:root {
+  --bg: #0b1413;
+  --surface: #14211f;
+  --pick: #1b2c29;
+  --line: #263836;
+  --fg: #e8e4d8;
+  --muted: #a3b0ab;
+  --gold: #c9a85c;
+  --bar: #5cc4a4;
+  --btn-bg: #c9a85c;
+  --btn-fg: #0b1413;
+  --tag: #1b2c29;
+  --font-display: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #e8e4d8;
+    --surface: #f2efe4;
+    --pick: #fbf9f1;
+    --line: #cdc7b5;
+    --fg: #101a18;
+    --muted: #46564f;
+    --gold: #7a5c14;
+    --bar: #0f6b55;
+    --btn-bg: #0f6b55;
+    --btn-fg: #f2efe4;
+    --tag: #ddd8c8;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #e8e4d8;
+  --surface: #f2efe4;
+  --pick: #fbf9f1;
+  --line: #cdc7b5;
+  --fg: #101a18;
+  --muted: #46564f;
+  --gold: #7a5c14;
+  --bar: #0f6b55;
+  --btn-bg: #0f6b55;
+  --btn-fg: #f2efe4;
+  --tag: #ddd8c8;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-inline: 20px;
+  padding-block: 36px 48px;
+}
+.stage { max-width: 880px; margin-inline: auto; display: flex; flex-direction: column; gap: 28px; }
+.stage > * { min-width: 0; }
+
+.eyebrow {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+h1, h2, h3, p { margin: 0; }
+h1, h2 { text-wrap: balance; }
+h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2rem, 6.2vw, 3.4rem);
+  line-height: 1.06;
+  text-transform: uppercase;
+}
+h1.sentence { font-size: clamp(1.7rem, 4.8vw, 2.7rem); text-transform: none; line-height: 1.15; }
+h2.question {
+  font-weight: 600;
+  font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+  line-height: 1.28;
+}
+.rule { width: 72px; height: 2px; background: var(--gold); }
+.lede { color: var(--muted); font-size: 1.05rem; max-width: 60ch; }
+.hl { color: var(--gold); }
+[tabindex="-1"]:focus { outline: none; }
+
+/* intro */
+.hero { display: grid; grid-template-columns: 1fr auto; gap: 36px; align-items: center; }
+.hero-copy { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; }
+.scales { width: 210px; max-width: 100%; height: auto; }
+.scales .st { stroke: var(--gold); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.scales .fl { fill: var(--gold); stroke: var(--gold); stroke-width: 3; stroke-linejoin: round; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: 0.9rem; list-style: none; padding: 0; margin: 0; }
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; gap: 24px; }
+  .scales { width: 130px; order: -1; }
+}
+
+/* buttons */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 26px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover:not(:disabled) { border-color: var(--muted); filter: none; }
+.btn:focus-visible, .opt input:focus-visible + .opt-body, summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* quiz */
+.prog { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.seg { height: 3px; background: var(--line); }
+.seg.done { background: var(--gold); }
+.qhead { display: flex; flex-direction: column; gap: 14px; }
+.options { display: grid; gap: 12px; }
+.opt { display: block; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.opt-body {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  gap: 14px;
+  align-items: baseline;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.opt:hover .opt-body { border-color: var(--muted); }
+.opt input:checked + .opt-body { background: var(--pick); border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+.letter { color: var(--gold); font-weight: 800; font-size: 1.15rem; }
+.opt-text { min-width: 0; }
+.actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.actions .right { display: flex; gap: 12px; margin-left: auto; }
+.counter { color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+/* results */
+.tops { display: grid; gap: 14px; }
+.top-card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+.top-card h3 { font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.95rem; color: var(--gold); }
+.top-card p { color: var(--fg); }
+.section-label { color: var(--muted); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
+.bars { display: grid; gap: 14px; margin-top: 12px; }
+.bar-row { display: grid; grid-template-columns: 9.5rem 1fr 3rem; gap: 14px; align-items: center; }
+.bar-name { font-weight: 600; font-size: 0.95rem; }
+.track { height: 10px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.fill { height: 100%; background: var(--bar); }
+.bar-row.lead .fill { background: var(--gold); }
+.bar-row.lead .bar-name { color: var(--gold); }
+.bar-score { text-align: right; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) {
+  .bar-row { grid-template-columns: 1fr auto; row-gap: 6px; }
+  .bar-row .track { grid-column: 1 / -1; grid-row: 2; }
+}
+details { border-top: 1px solid var(--line); padding-top: 16px; }
+summary { cursor: pointer; font-weight: 600; }
+.recap { display: grid; gap: 16px; margin-top: 16px; padding: 0; list-style: none; }
+.recap li { display: grid; gap: 6px; }
+.recap .qn { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--tag); color: var(--fg); font-size: 0.78rem; padding: 2px 10px; border-radius: 99px; }
+.note { color: var(--muted); font-size: 0.88rem; max-width: 60ch; }
+</style>
+
+<main class="stage" id="app"></main>
+
+<script>
+const APPROACHES = {
+  util:   { name: "Utilitarian",    text: "You weigh overall benefits against harms. A tool that helps courts rule faster and more consistently is worth keeping when its risks are measured and controlled." },
+  fair:   { name: "Fairness",       text: "You put equal treatment first. No one should face harsher conditions because of biased historical data or a process they cannot see, and every defendant keeps the right to challenge a score." },
+  care:   { name: "Ethics of Care", text: "You keep the person in view. Liberty is at stake, so a human who knows the circumstances reviews the score, and people are treated as more than a prediction." },
+  virtue: { name: "Virtue Ethics",  text: "You focus on character and integrity: honesty about errors, a judge who owns the decision, and accountability for the people who build and use the system." },
+  common: { name: "Common Good",    text: "You think about shared institutions. Public trust in justice depends on transparency, independent oversight, and rules that serve the whole community." }
+};
+
+const QUESTIONS = [
+  { q: "Adam receives a High-Risk score, but the judge is not sure how accurate the system is. What should happen?",
+    options: [
+      { id: "A", text: "Use the score only as supporting information and require human review before making a decision.", tags: ["util", "care"] },
+      { id: "B", text: "Stop using the score until the system is tested for unfair treatment.", tags: ["fair", "virtue"] },
+      { id: "C", text: "Allow limited use of the system while an independent organization audits it.", tags: ["common", "virtue"] }
+    ] },
+  { q: "An investigation finds that some groups receive High-Risk scores more often than others. What is the best response?",
+    options: [
+      { id: "A", text: "Improve the model, retrain it using better data, and continuously test its performance.", tags: ["util", "fair"] },
+      { id: "B", text: "Suspend its use in court decisions until the unequal results are properly investigated.", tags: ["fair", "care"] },
+      { id: "C", text: "Require an independent review and share the main findings so the justice system can improve.", tags: ["common", "virtue"] }
+    ] },
+  { q: "The company refuses to explain exactly how JusticeRisk calculates its scores because the algorithm is a trade secret. What should the court do?",
+    options: [
+      { id: "A", text: "Allow the company to protect some technical details, but require confidential review by an independent authority.", tags: ["util", "common"] },
+      { id: "B", text: "Do not use the system unless the company provides enough transparency to justify its decisions.", tags: ["virtue", "fair"] },
+      { id: "C", text: "At minimum, every defendant should receive an understandable explanation and a chance to challenge the result.", tags: ["fair", "care"] }
+    ] },
+  { q: "The judge personally believes Adam is Low Risk, but JusticeRisk gives him a High-Risk score. What should the judge do?",
+    options: [
+      { id: "A", text: "Review all available evidence and make the final decision personally rather than automatically following the AI.", tags: ["care", "virtue"] },
+      { id: "B", text: "Follow a standard procedure for resolving disagreements between judges and AI scores.", tags: ["fair", "common"] },
+      { id: "C", text: "Consider the AI score if it generally improves decision-making, but never use it alone.", tags: ["util"] }
+    ] },
+  { q: "Suppose JusticeRisk works well in most cases but occasionally produces seriously incorrect scores. Should it still be used?",
+    options: [
+      { id: "A", text: "Yes, if its overall benefits are greater than the harm and strong safeguards are in place.", tags: ["util"] },
+      { id: "B", text: "It should not influence decisions involving a person’s liberty without meaningful human review.", tags: ["care", "virtue"] },
+      { id: "C", text: "It may be used only if there are clear rules, independent monitoring, and a right to challenge the score.", tags: ["fair", "common"] }
+    ] },
+  { q: "Later, the court discovers that Adam’s High-Risk score was incorrect. What should happen next?",
+    options: [
+      { id: "A", text: "Correct Adam’s case and improve the system to reduce similar errors in the future.", tags: ["util", "care"] },
+      { id: "B", text: "Review other cases affected by the same system and temporarily restrict its use.", tags: ["fair", "common"] },
+      { id: "C", text: "Acknowledge the problem, investigate how it happened, and hold the responsible parties accountable.", tags: ["virtue", "common"] }
+    ] }
+];
+
+const TOTAL = QUESTIONS.length;
+const state = { step: "intro", i: 0, answers: Array(TOTAL).fill(null) };
+const app = document.getElementById("app");
+
+function scoreAnswers(answers) {
+  const s = {};
+  Object.keys(APPROACHES).forEach(function (k) { s[k] = 0; });
+  answers.forEach(function (a, qi) {
+    const opt = QUESTIONS[qi].options.find(function (o) { return o.id === a; });
+    if (opt) opt.tags.forEach(function (t) { s[t] += 1; });
+  });
+  return s;
+}
+function joinNames(list) {
+  if (list.length === 1) return list[0];
+  return list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
+}
+
+function introView() {
+  return '' +
+    '<div class="hero">' +
+      '<div class="hero-copy">' +
+        '<p class="eyebrow">CPCS428 · Interactive activity</p>' +
+        '<h1 tabindex="-1" data-focus>What would you decide?</h1>' +
+        '<div class="rule"></div>' +
+        '<p class="lede">JusticeRisk has rated Adam, who is accused of a minor offense, as High Risk. Answer six short questions about what should happen next. Your choices show how you reason about the case.</p>' +
+        '<ul class="facts"><li>6 questions</li><li>3 choices each</li><li>About 2 minutes</li></ul>' +
+        '<button class="btn" id="start" type="button">Start</button>' +
+      '</div>' +
+      '<svg class="scales" viewBox="0 0 200 170" role="img" aria-label="Scales of justice">' +
+        '<circle class="fl" cx="100" cy="14" r="6"/>' +
+        '<path class="st" d="M30 34 H170 M100 20 V150 M70 152 H130"/>' +
+        '<path class="st" d="M30 34 L10 100 M30 34 L50 100 M170 34 L150 100 M170 34 L190 100"/>' +
+        '<path class="fl" d="M10 100 H50 Q30 126 10 100 Z"/>' +
+        '<path class="fl" d="M150 100 H190 Q170 126 150 100 Z"/>' +
+      '</svg>' +
+    '</div>';
+}
+
+function quizView() {
+  const q = QUESTIONS[state.i];
+  const cur = state.answers[state.i];
+  let segs = "";
+  for (let n = 0; n < TOTAL; n++) segs += '<div class="seg' + (n <= state.i ? " done" : "") + '"></div>';
+  let opts = "";
+  q.options.forEach(function (o) {
+    opts += '<label class="opt"><input type="radio" name="answer" value="' + o.id + '"' + (cur === o.id ? " checked" : "") + '>' +
+      '<div class="opt-body"><span class="letter">' + o.id + '</span><span class="opt-text">' + o.text + '</span></div></label>';
+  });
+  const last = state.i === TOTAL - 1;
+  return '' +
+    '<div class="prog" aria-hidden="true">' + segs + '</div>' +
+    '<div class="qhead">' +
+      '<p class="eyebrow">Question ' + (state.i + 1) + ' of ' + TOTAL + '</p>' +
+      '<h2 class="question" tabindex="-1" data-focus>' + q.q + '</h2>' +
+    '</div>' +
+    '<form id="qform" class="options" role="radiogroup" aria-label="Answer choices">' + opts + '</form>' +
+    '<div class="actions">' +
+      '<span class="counter">' + (state.i + 1) + ' / ' + TOTAL + '</span>' +
+      '<div class="right">' +
+        '<button class="btn ghost" id="back" type="button">Back</button>' +
+        '<button class="btn" id="next" type="button"' + (cur ? "" : " disabled") + '>' + (last ? "See my result" : "Next") + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function resultsView() {
+  const s = scoreAnswers(state.answers);
+  const keys = Object.keys(APPROACHES);
+  const ranked = keys.slice().sort(function (a, b) { return s[b] - s[a] || keys.indexOf(a) - keys.indexOf(b); });
+  const best = s[ranked[0]];
+  const tops = ranked.filter(function (k) { return s[k] === best; });
+  const names = tops.map(function (k) { return '<span class="hl">' + APPROACHES[k].name + '</span>'; });
+  const plainNames = tops.map(function (k) { return APPROACHES[k].name; });
+  const headline = tops.length === 1
+    ? "Your primary ethical approach is " + names[0] + "."
+    : "Your ethical reasoning combines " + joinNames(names) + ".";
+
+  let topCards = "";
+  tops.forEach(function (k) {
+    topCards += '<div class="top-card"><h3>' + APPROACHES[k].name + '</h3><p>' + APPROACHES[k].text + '</p></div>';
+  });
+
+  let bars = "";
+  ranked.forEach(function (k) {
+    const pct = Math.round((s[k] / TOTAL) * 100);
+    bars += '<div class="bar-row' + (s[k] === best ? " lead" : "") + '">' +
+      '<span class="bar-name">' + APPROACHES[k].name + '</span>' +
+      '<div class="track" role="img" aria-label="' + APPROACHES[k].name + ': ' + s[k] + ' of ' + TOTAL + '"><div class="fill" style="width:' + pct + '%"></div></div>' +
+      '<span class="bar-score">' + s[k] + ' / ' + TOTAL + '</span></div>';
+  });
+
+  let recap = "";
+  state.answers.forEach(function (a, qi) {
+    const opt = QUESTIONS[qi].options.find(function (o) { return o.id === a; });
+    const chips = opt.tags.map(function (t) { return '<span class="chip">' + APPROACHES[t].name + '</span>'; }).join("");
+    recap += '<li><span class="qn">Question ' + (qi + 1) + ' · you chose ' + opt.id + '</span><span>' + opt.text + '</span><span class="chips">' + chips + '</span></li>';
+  });
+
+  return '' +
+    '<div class="qhead">' +
+      '<p class="eyebrow">Your result</p>' +
+      '<h1 class="sentence" tabindex="-1" data-focus>' + headline + '</h1>' +
+      '<div class="rule"></div>' +
+    '</div>' +
+    '<div class="tops">' + topCards + '</div>' +
+    '<section><p class="section-label">Points by approach</p><div class="bars">' + bars + '</div></section>' +
+    '<details><summary>Review my answers</summary><ul class="recap">' + recap + '</ul></details>' +
+    '<p class="note">Each choice adds a point to the approaches behind it. The result shows how you reason about this case, not a personality type.</p>' +
+    '<div class="actions"><span class="counter">' + joinNames(plainNames) + '</span><div class="right"><button class="btn" id="restart" type="button">Start over</button></div></div>';
+}
+
+function render() {
+  if (state.step === "intro") app.innerHTML = introView();
+  else if (state.step === "quiz") app.innerHTML = quizView();
+  else app.innerHTML = resultsView();
+  bind();
+  const f = app.querySelector("[data-focus]");
+  if (f) { try { f.focus({ preventScroll: true }); } catch (e) {} }
+  try { window.scrollTo(0, 0); } catch (e) {}
+}
+
+function bind() {
+  const start = document.getElementById("start");
+  if (start) start.addEventListener("click", function () { state.step = "quiz"; state.i = 0; render(); });
+
+  const form = document.getElementById("qform");
+  if (form) {
+    form.addEventListener("submit", function (e) { e.preventDefault(); });
+    form.addEventListener("change", function (e) {
+      state.answers[state.i] = e.target.value;
+      document.getElementById("next").disabled = false;
+    });
+  }
+  const back = document.getElementById("back");
+  if (back) back.addEventListener("click", function () {
+    if (state.i === 0) state.step = "intro"; else state.i -= 1;
+    render();
+  });
+  const next = document.getElementById("next");
+  if (next) next.addEventListener("click", function () {
+    if (!state.answers[state.i]) return;
+    if (state.i === TOTAL - 1) state.step = "results"; else state.i += 1;
+    render();
+  });
+  const restart = document.getElementById("restart");
+  if (restart) restart.addEventListener("click", function () {
+    state.step = "intro"; state.i = 0; state.answers = Array(TOTAL).fill(null);
+    render();
+  });
+}
+
+render();
+</script>
+
+</body></html>
